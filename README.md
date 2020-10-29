@@ -18,7 +18,7 @@ pip install -r requirements.txt
 ```sh
 python manage.py migrate
 ```
-для статики скачайте архив https://code.s3.yandex.net/backend-developer/learning-materials/static.zip и распакуйте его в директорию ./posts/static/
+для статики скачайте [архив](https://code.s3.yandex.net/backend-developer/learning-materials/static.zip) и распакуйте его в директорию ./posts/static/
 - собрать статику
 ```sh
 python manage.py collectstatic
