@@ -1,12 +1,13 @@
 from io import BytesIO
 
 import pytest
-from PIL import Image
 from django import forms
 from django.contrib.auth import get_user_model
 from django.core.files.base import File
-from posts.models import Post
 from django.db.models.query import QuerySet
+from PIL import Image
+from posts.models import Post
+
 
 def get_field_context(context, field_type):
     for field in context.keys():
@@ -20,11 +21,13 @@ class TestPostView:
     @pytest.mark.django_db(transaction=True)
     def test_post_view_get(self, client, post_with_group):
         try:
-            response = client.get(f'/{post_with_group.author.username}/{post_with_group.id}')
+            response = client.get(
+                f'/{post_with_group.author.username}/{post_with_group.id}')
         except Exception as e:
             assert False, f'''Страница `/<username>/<post_id>/` работает неправильно. Ошибка: `{e}`'''
         if response.status_code in (301, 302):
-            response = client.get(f'/{post_with_group.author.username}/{post_with_group.id}/')
+            response = client.get(
+                f'/{post_with_group.author.username}/{post_with_group.id}/')
         assert response.status_code != 404, \
             'Страница `/<username>/<post_id>/` не найдена, проверьте этот адрес в *urls.py*'
 
@@ -61,11 +64,13 @@ class TestPostEditView:
     @pytest.mark.django_db(transaction=True)
     def test_post_edit_view_get(self, client, post_with_group):
         try:
-            response = client.get(f'/{post_with_group.author.username}/{post_with_group.id}/edit')
+            response = client.get(
+                f'/{post_with_group.author.username}/{post_with_group.id}/edit')
         except Exception as e:
             assert False, f'''Страница `/<username>/<post_id>/edit/` работает неправильно. Ошибка: `{e}`'''
         if response.status_code in (301, 302) and not response.url.startswith(f'/{post_with_group.author.username}/{post_with_group.id}'):
-            response = client.get(f'/{post_with_group.author.username}/{post_with_group.id}/edit/')
+            response = client.get(
+                f'/{post_with_group.author.username}/{post_with_group.id}/edit/')
         assert response.status_code != 404, \
             'Страница `/<username>/<post_id>/edit/` не найдена, проверьте этот адрес в *urls.py*'
 
@@ -75,11 +80,13 @@ class TestPostEditView:
     @pytest.mark.django_db(transaction=True)
     def test_post_edit_view_author_get(self, user_client, post_with_group):
         try:
-            response = user_client.get(f'/{post_with_group.author.username}/{post_with_group.id}/edit')
+            response = user_client.get(
+                f'/{post_with_group.author.username}/{post_with_group.id}/edit')
         except Exception as e:
             assert False, f'''Страница `/<username>/<post_id>/edit/` работает неправильно. Ошибка: `{e}`'''
         if response.status_code in (301, 302):
-            response = user_client.get(f'/{post_with_group.author.username}/{post_with_group.id}/edit/')
+            response = user_client.get(
+                f'/{post_with_group.author.username}/{post_with_group.id}/edit/')
         assert response.status_code != 404, \
             'Страница `/<username>/<post_id>/edit/` не найдена, проверьте этот адрес в *urls.py*'
 
@@ -122,17 +129,21 @@ class TestPostEditView:
     def test_post_edit_view_author_post(self, user_client, post_with_group):
         text = 'Проверка изменения поста!'
         try:
-            response = user_client.get(f'/{post_with_group.author.username}/{post_with_group.id}/edit')
+            response = user_client.get(
+                f'/{post_with_group.author.username}/{post_with_group.id}/edit')
         except Exception as e:
             assert False, f'''Страница `/<username>/<post_id>/edit/` работает неправильно. Ошибка: `{e}`'''
-        url = f'/{post_with_group.author.username}/{post_with_group.id}/edit/' if response.status_code in (301, 302) else f'/{post_with_group.author.username}/{post_with_group.id}/edit'
+        url = f'/{post_with_group.author.username}/{post_with_group.id}/edit/' if response.status_code in (
+            301, 302) else f'/{post_with_group.author.username}/{post_with_group.id}/edit'
 
         image = self.get_image_file('image2.png')
-        response = user_client.post(url, data={'text': text, 'group': post_with_group.group_id, 'image': image})
+        response = user_client.post(
+            url, data={'text': text, 'group': post_with_group.group_id, 'image': image})
 
         assert response.status_code in (301, 302), \
             'Проверьте, что со страницы `/<username>/<post_id>/edit/` после создания поста перенаправляете на страницу поста'
-        post = Post.objects.filter(author=post_with_group.author, text=text, group=post_with_group.group).first()
+        post = Post.objects.filter(
+            author=post_with_group.author, text=text, group=post_with_group.group).first()
         assert post is not None, \
             'Проверьте, что вы изминили пост при отправки формы на странице `/<username>/<post_id>/edit/`'
         assert response.url.startswith(f'/{post_with_group.author.username}/{post_with_group.id}'),\

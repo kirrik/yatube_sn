@@ -79,7 +79,8 @@ class TestComment:
     @pytest.mark.django_db(transaction=True)
     def test_comment_add_auth_view(self, user_client, post):
         try:
-            response = user_client.get(f'/{post.author.username}/{post.id}/comment')
+            response = user_client.get(
+                f'/{post.author.username}/{post.id}/comment')
         except Exception as e:
             assert False, f'''Страница `/<username>/<post_id>/comment/` работает неправильно. Ошибка: `{e}`'''
         if response.status_code in (301, 302) and response.url == f'/{post.author.username}/{post.id}/comment/':
@@ -94,7 +95,8 @@ class TestComment:
 
         assert response.status_code in (301, 302), \
             'Проверьте, что со страницы `/<username>/<post_id>/comment/` после создания комментария перенаправляете на страницу поста'
-        comment = Comment.objects.filter(text=text, post=post, author=post.author).first()
+        comment = Comment.objects.filter(
+            text=text, post=post, author=post.author).first()
         assert comment is not None, \
             'Проверьте, что вы создаёте новый комментарий `/<username>/<post_id>/comment/`'
         assert response.url.startswith(f'/{post.author.username}/{post.id}'), \
